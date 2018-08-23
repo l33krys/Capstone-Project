@@ -1,0 +1,33 @@
+---
+title: "Capstone Project Proposal"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Idea #1: Wine Quality
+Using results gathered from physiochemical tests of red and white wine of the vinho verde type, we can predict the wine quality rating. 
+
+The data set is listed on the UCI Machine Learning Repository site ([link](https://archive.ics.uci.edu/ml/datasets/wine+quality)). There are 4,898 rows of data with 12 columns of attributes. There are no missing values in the data. The target variable we will try to predict is the quality rating. 
+
+There are many factors that affect the quality of wine. Soil, type of grape, weather and climate are just a few things to consider when making wine. Physiochemical tests can be performed on the wine. The results will provide us with a quantitative approach on how to identify attributes that influences a wine’s quality.
+
+With the results we find, wine makers can use this information to produce a quality wine. This will be key to their success in the wine business as without a good product they will not survive. 
+
+### Idea #2: Adult Data Set
+Data collected from Census database can be used to predict whether a person’s income is above or below $50,000.
+
+The data set is listed on the UCI Machine Learning Repository ([link](https://archive.ics.uci.edu/ml/datasets/census+income)). There are 48,842 rows of data with 14 columns of attributes. The data set contains missing values. Since the number of instances collected is so high, we can use a sample of this data set to predict whether the person’s income is above or below $50,000.
+
+Companies would be interested in these findings as they can use this to tailor their marketing strategies. If they know more about their potential and existing customers, they may be able to appeal to them by creating attractive offers. If much of the population are earning more than $50k/year, they may raise their prices or adjust strategy to take advantage of this. If Census data shows there are more people making less than $50k/year, they may take that into consideration when pricing products and extending offers and coupons. By having this analysis, they can create a better customer experience while increasing their bottom line.
+
+### Idea #3: Las Vegas Strip Data Set
+Data collected from TripAdivsor reviews of Las Vegas hotels will be used to identify which attributes influence a person’s review.
+
+The data set is listed on the UCI Machine Learning Repository site ([link](https://archive.ics.uci.edu/ml/datasets/Las+Vegas+Strip)). There are 504 rows of data with 20 columns of attributes. There are no missing values in the data. The target variable we will try to predict is the TripAdvisor rating.
+
+By analyzing the data collected from TripAdvisor reviews, we can identify what can influence a visitor’s review of their stay in Las Vegas. 
+
+Las Vegas hotel owners/managers will be interested in this data to better understand their visitors’ expectations. By having this knowledge, they will be able to be proactive in addressing areas where they fell short. If hotels can provide a solution, they will have a better chance in increasing the number of satisfied visitors and in turn create repeated visitors.
