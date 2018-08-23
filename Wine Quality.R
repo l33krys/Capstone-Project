@@ -1,0 +1,20 @@
+# Import datasets into R
+red <- read.csv(url("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"))
+white <- read.csv(url("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv"))
+
+# Separate data into appropriate columns using tidyr. Names of variables provided in names file.
+
+library(tidyr)
+red_clean <- separate(red, 1, c("fixed.acidity", "volatile.acidity", "citris.acid", "residual.sugar", "chlorides", "free.sulfur.dioxide", "total.sulfur.dioxide", "density", "pH", "sulfates", "alcohol", "quality"), sep = ";")
+white_clean <- separate(white, 1, c("fixed.acidity", "volatile.acidity", "citris.acid", "residual.sugar", "chlorides", "free.sulfur.dioxide", "total.sulfur.dioxide", "density", "pH", "sulfates", "alcohol", "quality"), sep = ";")
+
+# Add column in each data set to identify red or white using dplyr
+library(dplyr)
+red_clean <- mutate(red_clean, "color" = "red")
+white_clean <- mutate(white_clean, "color" = "white")
+
+# Combine data sets
+red_white <- bind_rows(red_clean, white_clean)
+
+# Reorder columns to have color be first column
+red_white <- select(red_white, "color", "fixed.acidity", "volatile.acidity", "citris.acid", "residual.sugar", "chlorides", "free.sulfur.dioxide", "total.sulfur.dioxide", "density", "pH", "sulfates", "alcohol", "quality")
