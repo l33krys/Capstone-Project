@@ -1,4 +1,4 @@
-# Import 2 data sets into R and combine into list
+# Import 2 data sets into R and create a list by passing URL through function
 # optional: import_data <- function(x, y) {
 #   red <- read.csv(url(x), sep = ";")
 #   white <- read.csv(url(y), sep = ";")
@@ -32,4 +32,12 @@ combo_data <- function(Lclean) {
 reorder_col <- function(L) {
   red_white_clean.df <- select(L, c(ncol(L), 1:(ncol(L)-1)))
   return(red_white_clean.df)
+}
+
+# Add binary quality column, rating of 6 and over is 1 and 5 and under is 0.
+binary_quality <- function(df) {
+  df$binary <- df$quality
+  df$binary[df$quality>=6] <- 1
+  df$binary[df$quality<=5] <- 0
+  df
 }
