@@ -118,14 +118,11 @@ capstone_all_scatter_boxplot <- function(df) {
 # Create frequency table to show how many of each wine quality rating
 # qual_freq_percent <- mutate(qual_freq, "percent" = paste(round((100 * freq/sum(freq)), 0), "%"))
 
-freq_percent <- function(df, col) {
-  #detach("package:dplyr", unload=TRUE)
-  qual_freq <- count(df, col) # col format 'column name'
+freq_percent <- function(df, x) {
+  qual_freq <- count(df, x) # col format 'column name'
   freq_col <- mutate(qual_freq, "percent" = paste(round((100 * freq/sum(freq)), 0), "%"))
   View(freq_col)
-  #install.packages("dplyr")
-  #library(dplyr)
-  }
+}
 
 # Function to show frequencies for all variable values
 freq_percent_all <- function(df) {
