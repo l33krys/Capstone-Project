@@ -7,7 +7,7 @@
 # Import source code from Capstone - Wrangling and run all functions to prepare data set for analysis
 capstone_wrangling_rw <- function() {
   source("~/Documents/Data Science Intro/Capstone Project/Capstone - Wrangling 102618.R")
-  L1 <- import_data_1()
+  L1 <- import_data_2()
   L2 <- add_col_1(L1)
   L3 <- combo_data(L2)
   L4 <- reorder_col(L3)
