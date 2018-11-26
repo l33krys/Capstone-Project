@@ -1,0 +1,500 @@
+---
+title: "Predicting Wine Quality"
+author: "Krystle Lee"
+date: "November 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = FALSE, message = FALSE}
+
+# Packages used in data wrangling for this analysis
+library(dplyr)
+library(plyr)
+library(knitr)
+
+```
+
+
+## Introduction
+
+Wine is an alcoholic beverage produced from grapes. The grapes are grown and harvested then turned into wine through the process of fermentation. Once fermentation has taken place, the wine can be left to age in wine tanks, barrels or bottles to develop to its full potential. This natural process of turning grapes into wine has become more of an art and science over the years. Winemakers are always looking to improve their wine process to produce the best tasting wines.
+
+There are many different varieties of grapes and even more varieties of wines. There are red and white wines, rose, sparkling to name a few. Many factors affect the quality of wine. Soil, type of grape, weather and climate are just a few factors to consider when making wine. Since some of these factors are out of our control and up to mother-nature, there are things that winemakers can do to help control the quality of wine they provide to their customers. By performing physiochemical tests on the wine, they can use these results in a quantitative approach on how to identify attributes that influence a wine's quality.
+
+
+## Data Set
+
+The data used in this analysis came from UCI Machine Learning Repository and sourced from Paulo Cortez, University of Minho. There are two data sets of the vinho verde wine separated by wine color, red and white. There is information on 4,898 wines with 12 columns of attributes. There are no missing values in the data. The target variable that we will try to predict is the quality rating. There is no data provided on the grape type, wine brand, and selling price due to privacy and logistic issues.
+
+## Prepping the Data
+
+Not much wrangling was needed to prepare the data set due to no missing values in the observations. Originally, the data was going to be combined into one large data set with red and white wines. Since red and white wines are appreciated for their different characteristics, the data sets will be analyzed separately.
+
+To perform a logistic regression on the data, the quality ratings were transformed into binary variables. 0 being bad quality and 1 being good quality wine.
+
+```{r echo = TRUE}
+# Function that imports Wine Quality Data Set by indicating "red" OR "white"
+import_data_color <- function(x) { # Put color in quotation marks
+  if (x == "red") {
+    red <- read.csv(url("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"), sep = ";")
+    return(red)
+  } else if (x == "white") {
+    white <- read.csv(url("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv"), sep = ";")
+    return(white)
+  } else {
+    return("Specify red or white data set")
+  }
+}
+
+# Import data sets
+red <- import_data_color("red")
+white <- import_data_color("white")
+
+
+# Add binary quality column, rating of 6 and over is 1 (good) and 5 and under is 0 (bad).
+binary_quality <- function(df) {
+  df$binary <- df$quality
+  df$binary[df$quality>=6] <- 1
+  df$binary[df$quality<=5] <- 0
+  df
+}
+
+# Convert binary values into factors
+factor.binary <- function(df) {
+  df$binary <- as.factor(df$binary)
+  df
+}
+
+# Transform quality rating column into binary variables
+red <- binary_quality(red)
+white <- binary_quality(white)
+
+red <- select(red, -quality)
+white <- select(white, -quality)
+
+```
+
+## Exploring the Data
+
+To get a general idea of how the data was structured and basic metrics of the data, the following functions were run.
+
+```{r echo = TRUE}
+
+# Look at the structure of the data sets
+str(red)
+str(white)
+
+# Look at the summary of the data sets
+summary(red)
+summary(white)
+
+# Look at the first few lines of observations
+head(red, n = 5)
+head(white, n = 5)
+
+```
+
+To dig a little deeper into the data, ggplot2 package was used to create charts.
+
+### Bar Charts
+
+``` {r echo = FALSE, message = FALSE}
+
+# Packages used in exploratory data analysis
+library(ggplot2)
+
+```
+
+```{r echo = TRUE}
+
+# Plot bar chart of quality
+capstone_bar <- function(df, dfcol, xlabel, ylabel) {
+  print(ggplot(df, aes(x = factor(dfcol))) + 
+    geom_bar(width = .5) + 
+    xlab(xlabel) +
+    ylab(ylabel))
+}
+
+```
+
+```{r echo = TRUE}
+
+capstone_bar(red, red$binary, "Quality - Binary Variable", "Number of Red Wines")
+capstone_bar(white, white$binary, "Quality - Binary Variable", "Number of White Wines")
+
+```
+
+### Box Plots
+
+```{r echo = TRUE}
+# Plot ALL boxplots by wine quality rating
+capstone_all_boxplots <- function(df) {
+  columns <- colnames(df)
+  for (i in 1:(length(columns)-1)) {
+    print(ggplot(df, aes(x = factor(df$binary), y = df[,i])) +
+      geom_boxplot(width = .25) +
+      xlab("quality") +
+      ylab(columns[i]))
+  }
+}
+
+```
+
+```{r fig.width=3, fig.height=3, echo = TRUE}
+
+capstone_all_boxplots(red)
+capstone_all_boxplots(white)
+
+```
+
+### Frequency and count charts
+
+```{r echo = TRUE}
+
+# Create frequency table to show how many of each wine quality rating
+freq.percent <- function(df, x) {
+  qual.freq <- count(df, x) # put actual column name in quotation marks ie. 'column name'
+  freq.col <- mutate(qual.freq, "percent" = paste(round((100 * freq/sum(freq)), 0), "%"))
+  print(freq.col)
+}
+
+# Function to identify number of unique values in each column
+unique.all <- function(df) {
+  columns <- colnames(df)
+  unique.df <- data.frame(matrix(ncol = 2, nrow = 12))
+  for (i in 1:12) {
+    unique_variable <- length(unique(df[,i]))
+    unique.df[i, 2] <- unique_variable
+    unique.df[i, 1] <- columns[i]
+  }
+  colnames(unique.df) <- c("variable", "unique.variables")
+  unique.df <- arrange(unique.df, desc(unique.variables))
+  print(unique.df)
+}
+
+```
+
+```{r echo = TRUE}
+
+freq.percent(red, "binary")
+freq.percent(white, "binary")
+
+unique.all(red)
+unique.all(white)
+
+```
+
+### Chisquare values
+
+``` {r warning = FALSE, message = FALSE, error = FALSE, echo = TRUE}
+# chi-square test with quality rating
+chi.sq <- function(df) {
+  columns <- colnames(df)
+  pvalue.df <- data.frame(matrix(ncol = 2, nrow = 11))
+  for (i in 1:11) {
+    test.result <- chisq.test(table(df[,12], df[,i]))
+    pvalue.df[i, 2] <- test.result$p.value
+    pvalue.df[i, 1] <- columns[i]
+  }
+  colnames(pvalue.df) <- c("variable", "pvalue")
+  pvalue.df <- arrange(pvalue.df, desc(pvalue))
+  return(pvalue.df)
+}
+```
+
+```{r echo = TRUE}
+
+chi.sq(red)
+chi.sq(white)
+
+```
+
+### Correlation tables
+
+``` {r echo = TRUE}
+
+# Calculate correlation coefficient table for all values
+
+kable(cor(red), digits = 2)
+kable(cor(white), digits = 2)
+
+```
+
+### Quantiles
+
+``` {r echo = TRUE}
+
+# Identify 1%, 5%, 10%, 90%, 99%, and 100% range
+quantile.all <- function(df) {
+  columns <- colnames(df)
+  quant.df <- data.frame(matrix(ncol = 6, nrow = 12))
+  probability <- c(.01, .05, .1, .90, .99, 1)
+  for (i in 1:length(columns)) {
+    quantile.variable <- quantile(df[,i], probs = probability)
+    quant.df[i, ] <- quantile.variable
+  }
+  quant.df <- cbind(columns, quant.df)
+  names(quant.df) <- c("variable", ".01", ".05", ".1", ".90", ".99", "1")
+  print(quant.df)
+}
+
+```
+
+``` {r echo = TRUE}
+
+quantile.all(red)
+quantile.all(white)
+
+```
+
+## Analysis Approach: Training and Testing Sets
+
+Each data set was separated into a training and testing set. By creating two separate sets we can use the training set to create a prediction model and then add in our testing set to see how well it performs. This is a good way to see if we have overfitted our data. Our goal is to find a model that performs similar or better with the testing set.
+
+The caTools package was used to split the data into training (67%) and testing (33%) sets.
+
+``` {r echo = FALSE, message = FALSE}
+
+# Packages used for logistic regression analysis
+library(caTools)
+library(caret)
+library(ROCR)
+library(MASS)
+
+```
+
+``` {r echo = TRUE}
+
+# Split data using sample.split function
+
+capstone_training <- function(dfcol, dataframe) {
+  set.seed(123456)
+  split <- sample.split(dfcol, SplitRatio = .67)
+  training.set <- subset(dataframe, split == TRUE)
+  return(training.set)
+}
+
+capstone_testing <- function(dfcol, dataframe) {
+  set.seed(123456)
+  split <- sample.split(dfcol, SplitRatio = .67)
+  testing.set <- subset(dataframe, split == FALSE)
+  return(testing.set)
+}
+
+# Create training and testing sets
+redTrain <- capstone_training(red$binary, red)
+redTest <- capstone_testing(red$binary, red)
+
+whiteTrain <- capstone_training(white$binary, white)
+whiteTest <- capstone_testing(white$binary, white)
+
+```
+
+
+## Create GLM and Prediction Models
+
+Once the data was split, a glm (generalized linear model) was created to identify which variables were significant to the quality of wine.
+
+Two methods were used to idenify the significan variables.
+
+1. Use all variables in glm model
+
+``` {r echo = TRUE}
+# glm with all variables
+redTrain.glm.all <- glm(binary ~ . , data = redTrain, family = binomial)
+summary(redTrain.glm.all)
+
+# glm with all variables
+whiteTrain.glm.all <- glm(binary ~ . , data = whiteTrain, family = binomial)
+summary(whiteTrain.glm.all)
+
+```
+
+
+2. Use stepwise method
+
+``` {r echo = TRUE}
+
+# glm with stepAIC function from MASS package. Slight variation in model.
+
+# stepAIC model selection by AIC
+redTrain.glm.sw <- stepAIC(redTrain.glm.all, trace = FALSE)
+summary(redTrain.glm.sw)
+
+whiteTrain.glm.sw <- stepAIC(whiteTrain.glm.all, trace = FALSE)
+summary(whiteTrain.glm.sw)
+
+```
+
+After looking at the summary of the models, the models that used the stepwise method provided a lower AIC. Since lower AIC between models using the same data set is ideal, these models were carried forward in the analysis.
+
+## Model Evaluation and Metrics
+
+### Prediction Models
+
+Running the predict function on the models provided probabilities for the binary variables.
+
+``` {r eval = TRUE}
+
+# Use glm model with specific significant variables to run predictions
+predict.redTrain <- predict(redTrain.glm.sw, type = "response")
+summary(predict.redTrain)
+# Identify average probablity of binary variable on training set. 0 = 37.8%; 1 = 67.1%
+tapply(predict.redTrain, redTrain$binary, mean)
+
+# Use glm model with specific significant variables to run predictions
+predict.whiteTrain <- predict(whiteTrain.glm.sw, type = "response")
+summary(predict.whiteTrain)
+# Identify average probablity of binary variable on training set. 0 = 50%; 1 = 74.7%
+tapply(predict.whiteTrain, whiteTrain$binary, mean)
+
+```
+
+
+### Confusion Matrix
+
+By setting the threshold rate to greater than 50%, a confusion matrix was created to identify the sensitivity, specificity and accuracy rate.
+
+``` {r eval = TRUE}
+
+# Set threshold value to 50%; no preference on either rate at this point. Check confusion matrix; accuracy = 75%
+table(redTrain$binary, predict.redTrain > 0.50)
+
+# Set threshold value to 50%; no preference on either rate at this point. Check confusion matrix; accuracy = 75%
+table(whiteTrain$binary, predict.whiteTrain > 0.50)
+
+```
+
+### ROC Curve and AUC
+
+The ROC curve was plotted showing the false positive rate against the true positive rate. The AUC was calculated at 81.4% for red and 80% for white.
+
+``` {R eval = TRUE}
+
+# To plot an ROC, create a prediction model to standardize format
+ROCRpred.redTrain <- prediction(predict.redTrain, redTrain$binary)
+ROCRperf.redTrain <- performance(ROCRpred.redTrain, "tpr", "fpr")
+# Plot ROCR
+plot(ROCRperf.redTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj = c(-.2,1.7))
+# Identify AUC = 81%
+as.numeric(performance(ROCRpred.redTrain, "auc")@y.values)
+#ROCR performance of sensitivity and specificity
+Sens.ROCRpred.redTrain <- performance(ROCRpred.redTrain,  measure="sens", x.measure="cutoff")
+Spec.ROCRpred.redTrain <- performance(ROCRpred.redTrain,  measure="spec", x.measure="cutoff")
+
+# Plot sensitivity and specificity rates to find where they intersect as best tradeoff between rates
+plot(Sens.ROCRpred.redTrain, type="l", col="red",xlab="",ylab="")
+par(new=TRUE)
+plot(Spec.ROCRpred.redTrain, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
+
+
+# To plot an ROC, create a prediction model to standardize format
+ROCRpred.whiteTrain <- prediction(predict.whiteTrain, whiteTrain$binary)
+ROCRperf.whiteTrain <- performance(ROCRpred.whiteTrain, "tpr", "fpr")
+# Plot ROCR
+plot(ROCRperf.whiteTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj = c(-.2,1.7))
+# Identify AUC = 80%
+as.numeric(performance(ROCRpred.whiteTrain, "auc")@y.values)
+
+#ROCR performance of sensitivity and specificity
+Sens.ROCRpred.whiteTrain <- performance(ROCRpred.whiteTrain,  measure="sens", x.measure="cutoff")
+Spec.ROCRpred.whiteTrain <- performance(ROCRpred.whiteTrain,  measure="spec", x.measure="cutoff")
+
+# Plot sensitivity and specificity rates to find where they intersect as best tradeoff between rates
+plot(Sens.ROCRpred.whiteTrain, type="l", col="red",xlab="",ylab="")
+par(new=TRUE)
+plot(Spec.ROCRpred.whiteTrain, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
+
+```
+
+## Apply Testing Sets to Prediction Models
+
+The testing data was incorporated into the prediction model created with the training set. The same steps were performed on the data. The results showed similar results withe sensitivity, specificity, and accuracy rate. The ROC curve and AUC only varied slightly proving that our model has consistently performed on new data.
+
+``` {r eval = TRUE}
+
+#-----Apply testing set to model-----
+
+# Testing data set already created in earlier steps
+# Use glm model from training set to apply to testing set
+predict.redTest <- predict(redTrain.glm.sw, type = "response", newdata = redTest)
+summary(predict.redTest)
+# Identify average probablity of binary variable on training set. 0 = 36.5%; 1 = 66.5%
+tapply(predict.redTest, redTest$binary, mean)
+
+#-----Plot ROCR and identify AUC-----
+
+# Set threshold value to 50% as was done with train set; accuracy = 74%
+table(redTest$binary, predict.redTest > 0.5)
+
+# To plot an ROC, create a prediction model to standardize format
+ROCRpred.redTest <- prediction(predict.redTest, redTest$binary)
+ROCRperf.redTest <- performance(ROCRpred.redTest, "tpr", "fpr")
+# Plot ROCR
+plot(ROCRperf.redTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj = c(-.2,1.7))
+
+ROCRpred.redTest <- prediction(predict.redTest, redTest$binary)
+# Identify AUC = 82%
+as.numeric(performance(ROCRpred.redTest, "auc")@y.values)
+
+#ROCR performance of sensitivity and specificity
+Sens.ROCRpred.redTest <- performance(ROCRpred.redTest,  measure="sens", x.measure="cutoff")
+Spec.ROCRpred.redTest <- performance(ROCRpred.redTest,  measure="spec", x.measure="cutoff")
+
+# Plot sensitivity and specificity rates to find where they intersect as best tradeoff between rates
+plot(Sens.ROCRpred.redTest, type="l", col="red",xlab="",ylab="")
+par(new=TRUE)
+plot(Spec.ROCRpred.redTest, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
+
+```
+
+``` {r eval = TRUE}
+
+#-----Apply testing set to model-----
+
+# Testing data set already created in earlier steps
+# Use glm model from training set to apply to testing set
+predict.whiteTest <- predict(whiteTrain.glm.sw, type = "response", newdata = whiteTest)
+summary(predict.whiteTest)
+# Identify average probablity of binary variable on training set. 0 = 50%; 1 = 75%
+tapply(predict.whiteTest, whiteTest$binary, mean)
+
+#-----Plot ROCR and identify AUC-----
+
+# Set threshold value to 50% as was done with train set; accuracy = 74%
+table(whiteTest$binary, predict.whiteTest > 0.5)
+
+# To plot an ROC, create a prediction model to standardize format
+ROCRpred.whiteTest <- prediction(predict.whiteTest, whiteTest$binary)
+ROCRperf.whiteTest <- performance(ROCRpred.whiteTest, "tpr", "fpr")
+# Plot ROCR
+plot(ROCRperf.whiteTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj = c(-.2,1.7))
+
+# Identify AUC = 82%
+as.numeric(performance(ROCRpred.whiteTest, "auc")@y.values)
+
+#ROCR performance of sensitivity and specificity
+Sens.ROCRpred.whiteTest <- performance(ROCRpred.whiteTest,  measure="sens", x.measure="cutoff")
+Spec.ROCRpred.whiteTest <- performance(ROCRpred.whiteTest,  measure="spec", x.measure="cutoff")
+
+# Plot sensitivity and specificity rates to find where they intersect as best tradeoff between rates
+plot(Sens.ROCRpred.whiteTest, type="l", col="red",xlab="",ylab="")
+par(new=TRUE)
+plot(Spec.ROCRpred.whiteTest, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
+
+```
+
+## Final Takeaways
+
+Winemakers can use these prediction models created to see if the wines they're producing are good quality wines. By having this understanding of their wines, it will empower winemakers to more informed decisions on what to do with their wines. If results show they have produced bad quality wines, they can repurpose them to create wine blends or eliminate them altogether to reduce any further costs. If the wines are good quality, they can have relief in knowing that they're providing their customers with a great wine experience. 
+
+## Sources
+[UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/wine+quality)  
+[5 Stages of the Wine Making Process](http://laurelgray.com/5-stages-wine-making-process/)  
+[Wine Characteristics](https://winefolly.com/review/wine-characteristics/)  
+[Winemaking](https://en.wikipedia.org/wiki/Winemaking)  
+[Image: Wine](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=2ahUKEwigoP2YvfHeAhXTMX0KHYICDI8QjRx6BAgBEAU&url=https%3A%2F%2Fwww.maxpixel.net%2FWhite-Wine-Glass-Port-Wine-Red-Wine-Wine-2265324&psig=AOvVaw0HpIFtbaGzhVjqkrHtgeSc&ust=1543301751264371)
