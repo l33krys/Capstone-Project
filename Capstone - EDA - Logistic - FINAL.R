@@ -40,25 +40,6 @@ capstone_bar <- function(df, dfcol, xlabel, ylabel) {
     ylab(ylabel))
 }
 
-# Plot  histograms
-capstone_histograms <- function(df, dfcol) {
-  print(ggplot(df, aes(x = dfcol)) +
-            geom_histogram(binwidth = (max(dfcol) - min(dfcol)) / 10) +
-            xlab("test"))
-  }
-
-# Plot ALL histograms
-capstone_all_histograms <- function(df) {
-  columns <- colnames(df)
-  # Start function at column 2 since column 1 is text
-  for (i in 1:(length(columns)-1)) {
-    binwidth.10 <- (max(df$columns[i]) - min(df$columns[i])) / 10
-    print(ggplot(df, aes(x = df[,i])) +
-      geom_histogram(binwidth = .5) +
-      xlab(columns[i]))
-  }
-}
-
 # Plot INDIVIDUAL scatterplots by wine quality rating
 capstone_scatter <- function(df, y_value, title, xlabel, ylabel) {
   capstone_scatter <- ggplot(df, aes(x = factor(df$binary), y = y_value)) + 
