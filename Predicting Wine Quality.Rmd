@@ -1,7 +1,7 @@
 ---
 title: "Predicting Wine Quality"
 author: "Krystle Lee"
-date: "November 25, 2018"
+date: "November 29, 2018"
 output:
   html_document: default
   pdf_document: default
@@ -507,7 +507,11 @@ plot(Spec.ROCRpred.whiteTest, type="l", col="blue", xlab="Probability cutoff (th
 
 In this project we used data from physiochemical tests on red and white wines to predict wine quality. Our models achieved very good predictive performance on the testing set (e.g. ROC area of 80%). 
 
-Winemakers can use these prediction models created to see if the wines they're producing are good quality wines. By having this understanding of their wines, it will empower winemakers to more informed decisions on what to do with their wines. If results show they have produced bad quality wines, they can repurpose them to create wine blends or eliminate them altogether to reduce any further costs. If the wines are good quality, they can have relief in knowing that they're providing their customers with a great wine experience. 
+Winemakers can use these prediction models created to see if the wines they're producing are good quality wines. By having this understanding of their wines, it will empower winemakers to more informed decisions on what to do with their wines. 
+
+If results show they have produced bad quality wines, they can repurpose them to create wine blends or eliminate them altogether to reduce any further costs. They can also use this analysis as a starting point for further research into what causes the high and low physiochemical results that have the most significant impact on wine quality
+
+If the wines are good quality, they can have relief in knowing that they're providing their customers with a great wine experience. 
 
 ## Sources
 [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/wine+quality)  
