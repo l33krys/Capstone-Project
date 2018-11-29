@@ -34,8 +34,9 @@ library(plyr)
 
 # Plot bar chart of quality
 capstone_bar <- function(df, dfcol, xlabel, ylabel) {
-  print(ggplot(df, aes(x = factor(dfcol))) + 
+  print(ggplot(df, aes(x = factor(dfcol), fill = factor(dfcol))) +
     geom_bar(width = .5) + 
+    # geom_text(aes(label = binary)) +
     xlab(xlabel) +
     ylab(ylabel))
 }

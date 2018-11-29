@@ -76,7 +76,6 @@ plot(ROCRperf.whiteTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.
 as.numeric(performance(ROCRpred.whiteTrain, "auc")@y.values)
 # Find optimal threshold value = 0.6367076
 SensSpec.whiteTrain <- performance(ROCRpred.whiteTrain,  "sens", "spec")
-CP.whiteTrain <-SensSpec.whiteTrain@alpha.values[[1]][which.max(SensSpec.whiteTrain@x.values[[1]]+SensSpec.whiteTrain@y.values[[1]])]
 
 #ROCR performance of sensitivity and specificity
 Sens.ROCRpred.whiteTrain <- performance(ROCRpred.whiteTrain,  measure="sens", x.measure="cutoff")
@@ -86,7 +85,6 @@ Spec.ROCRpred.whiteTrain <- performance(ROCRpred.whiteTrain,  measure="spec", x.
 plot(Sens.ROCRpred.whiteTrain, type="l", col="red",xlab="",ylab="")
 par(new=TRUE)
 plot(Spec.ROCRpred.whiteTrain, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
-abline(v = CP.whiteTrain, col = "black", lty = 3)#add a line indicating the suggested 'optimal' cutoff value differing from the visually expected one
 
 
 #-----Apply testing set to model-----
@@ -117,7 +115,6 @@ plot(ROCRperf.whiteTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.
 as.numeric(performance(ROCRpred.whiteTest, "auc")@y.values)
 # Find optimal threshold value for test set = 0.463297
 SensSpec.whiteTest <- performance(ROCRpred.whiteTest,  "sens", "spec")
-CP.whiteTest <-SensSpec.whiteTest@alpha.values[[1]][which.max(SensSpec.whiteTest@x.values[[1]]+SensSpec.whiteTest@y.values[[1]])]
 
 #ROCR performance of sensitivity and specificity
 Sens.ROCRpred.whiteTest <- performance(ROCRpred.whiteTest,  measure="sens", x.measure="cutoff")
@@ -127,4 +124,3 @@ Spec.ROCRpred.whiteTest <- performance(ROCRpred.whiteTest,  measure="spec", x.me
 plot(Sens.ROCRpred.whiteTest, type="l", col="red",xlab="",ylab="")
 par(new=TRUE)
 plot(Spec.ROCRpred.whiteTest, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
-abline(v = CP.redTest, col = "black", lty = 3)#add a line indicating the suggested 'optimal' cutoff value differing from the visually expected one

@@ -2,7 +2,9 @@
 title: "Predicting Wine Quality"
 author: "Krystle Lee"
 date: "November 25, 2018"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -128,6 +130,8 @@ capstone_bar(white, white$binary, "Quality - Binary Variable", "Number of White 
 
 ```
 
+The red data set is more balanced than the white data set (e.g. in the red data set 53.4% are good quality, while in the white data set 66.5% are good quality). Handling data imbalance in the predictive model was not attempted in this project because imbalance was not severe. This is a topic that can be explored in future work. 
+
 ### Box Plots
 
 ```{r echo = TRUE}
@@ -151,6 +155,8 @@ capstone_all_boxplots(white)
 
 ```
 
+These boxplots provide an indication about the attributes that appear to be predictive of wine quality. For example, lower acidity seems to be associated with good quality in both red and white wine. Similarly, higher alcohol content appears to be associated with good quality wine.
+
 ### Frequency and count charts
 
 ```{r echo = TRUE}
@@ -167,12 +173,12 @@ unique.all <- function(df) {
   columns <- colnames(df)
   unique.df <- data.frame(matrix(ncol = 2, nrow = 12))
   for (i in 1:12) {
-    unique_variable <- length(unique(df[,i]))
-    unique.df[i, 2] <- unique_variable
+    unique_values <- length(unique(df[,i]))
+    unique.df[i, 2] <- unique_values
     unique.df[i, 1] <- columns[i]
   }
-  colnames(unique.df) <- c("variable", "unique.variables")
-  unique.df <- arrange(unique.df, desc(unique.variables))
+  colnames(unique.df) <- c("variable", "unique.values")
+  unique.df <- arrange(unique.df, desc(unique.values))
   print(unique.df)
 }
 
@@ -190,7 +196,7 @@ unique.all(white)
 
 ### Chisquare values
 
-``` {r warning = FALSE, message = FALSE, error = FALSE, echo = TRUE}
+``` {r warning = FALSE, message = FALSE, error = FALSE, eval = TRUE}
 # chi-square test with quality rating
 chi.sq <- function(df) {
   columns <- colnames(df)
@@ -206,7 +212,7 @@ chi.sq <- function(df) {
 }
 ```
 
-```{r echo = TRUE}
+```{r warning = FALSE, message = FALSE, error = FALSE, eval = TRUE}
 
 chi.sq(red)
 chi.sq(white)
@@ -223,6 +229,12 @@ kable(cor(red), digits = 2)
 kable(cor(white), digits = 2)
 
 ```
+
+There is strong correlation between some of the physiochemical properties collected in the data. 
+
+From these correlation estimates, lower volatile acidity and higher alcohol content leans toward a quality red wine.
+
+Higher alcohol content leans toward a quality white wine. A couple other variables to take notice are volatile acidity and density that are almost moderately correlated.
 
 ### Quantiles
 
@@ -253,7 +265,8 @@ quantile.all(white)
 
 ## Analysis Approach: Training and Testing Sets
 
-Each data set was separated into a training and testing set. By creating two separate sets we can use the training set to create a prediction model and then add in our testing set to see how well it performs. This is a good way to see if we have overfitted our data. Our goal is to find a model that performs similar or better with the testing set.
+Each data set (red and white wine) was separated into a training and testing set. We can use the training set and then our testing set to assess the performance of the model. This is a standard method to evaluate the model and check whether it overfits the training data. Our goal is to find a model that performs similarly in both training and testing set.
+
 
 The caTools package was used to split the data into training (67%) and testing (33%) sets.
 
@@ -297,7 +310,7 @@ whiteTest <- capstone_testing(white$binary, white)
 
 ## Create GLM and Prediction Models
 
-Once the data was split, a glm (generalized linear model) was created to identify which variables were significant to the quality of wine.
+Once the data was split, a GLM (generalized linear model) was created to identify which variables were significant to the quality of wine.
 
 Two methods were used to idenify the significan variables.
 
@@ -315,7 +328,7 @@ summary(whiteTrain.glm.all)
 ```
 
 
-2. Use stepwise method
+2. Use stepwise method to select a subset of variables
 
 ``` {r echo = TRUE}
 
@@ -331,6 +344,8 @@ summary(whiteTrain.glm.sw)
 ```
 
 After looking at the summary of the models, the models that used the stepwise method provided a lower AIC. Since lower AIC between models using the same data set is ideal, these models were carried forward in the analysis.
+
+By looking at the p-values, we can find which attributes are more significantly associated with wine quality. For example, for the white wine all p-values are smaller than .05. Further, by looking at the parameter estimates we can derive whether high or low values of the attribute are better for good quality wine. For example the sign of volatile.acidity is negative, thus the lower the value of this variable the higher the probability of good quality wine.
 
 ## Model Evaluation and Metrics
 
@@ -488,7 +503,9 @@ plot(Spec.ROCRpred.whiteTest, type="l", col="blue", xlab="Probability cutoff (th
 
 ```
 
-## Final Takeaways
+## Conclusion
+
+In this project we used data from physiochemical tests on red and white wines to predict wine quality. Our models achieved very good predictive performance on the testing set (e.g. ROC area of 80%). 
 
 Winemakers can use these prediction models created to see if the wines they're producing are good quality wines. By having this understanding of their wines, it will empower winemakers to more informed decisions on what to do with their wines. If results show they have produced bad quality wines, they can repurpose them to create wine blends or eliminate them altogether to reduce any further costs. If the wines are good quality, they can have relief in knowing that they're providing their customers with a great wine experience. 
 

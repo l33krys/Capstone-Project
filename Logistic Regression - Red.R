@@ -76,7 +76,6 @@ plot(ROCRperf.redTrain, colorsize = TRUE, print.cutoffs.at=seq(0,1,0.1), text.ad
 as.numeric(performance(ROCRpred.redTrain, "auc")@y.values)
 # Find optimal threshold value = 0.4844531
 SensSpec.redTrain <- performance(ROCRpred.redTrain,  "sens", "spec")
-CP.redTrain <-SensSpec.redTrain@alpha.values[[1]][which.max(SensSpec.redTrain@x.values[[1]]+SensSpec.redTrain@y.values[[1]])]
 
 #ROCR performance of sensitivity and specificity
 Sens.ROCRpred.redTrain <- performance(ROCRpred.redTrain,  measure="sens", x.measure="cutoff")
@@ -86,7 +85,6 @@ Spec.ROCRpred.redTrain <- performance(ROCRpred.redTrain,  measure="spec", x.meas
 plot(Sens.ROCRpred.redTrain, type="l", col="red",xlab="",ylab="")
 par(new=TRUE)
 plot(Spec.ROCRpred.redTrain, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
-abline(v = CP.redTrain, col = "black", lty = 3)#add a line indicating the suggested 'optimal' cutoff value differing from the visually expected one
 
 
 #-----Apply testing set to model-----
@@ -118,7 +116,6 @@ ROCRpred.redTest <- prediction(predict.redTest, redTest$binary)
 as.numeric(performance(ROCRpred.redTest, "auc")@y.values)
 # Find optimal threshold value for test set = 0.463297
 SensSpec.redTest <- performance(ROCRpred.redTest,  "sens", "spec")
-CP.redTest <-SensSpec.redTest@alpha.values[[1]][which.max(SensSpec.redTest@x.values[[1]]+SensSpec.redTest@y.values[[1]])]
 
 #ROCR performance of sensitivity and specificity
 Sens.ROCRpred.redTest <- performance(ROCRpred.redTest,  measure="sens", x.measure="cutoff")
@@ -128,4 +125,3 @@ Spec.ROCRpred.redTest <- performance(ROCRpred.redTest,  measure="spec", x.measur
 plot(Sens.ROCRpred.redTest, type="l", col="red",xlab="",ylab="")
 par(new=TRUE)
 plot(Spec.ROCRpred.redTest, type="l", col="blue", xlab="Probability cutoff (threshold)",ylab="Sensitivity/Specificity")
-abline(v = CP.redTest, col = "black", lty = 3)#add a line indicating the suggested 'optimal' cutoff value differing from the visually expected one
